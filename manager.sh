@@ -38,6 +38,7 @@ function install {
 	echo -n "Creating user $user: "
 	if [ $code -ne 0 ]; then
 		useradd -r -c "user for $serviceName service" -g $serviceGroup -d $serviceHomeDirectory $user
+		chown $user:$user -R $serviceHomeDirector
 		displaySuccessMessage "Done"
 	else
 		displaySuccessMessage "Already exists"
@@ -72,6 +73,7 @@ function uninstall {
 	local user="$serviceName"
 	local userGroups=$(groups $serviceName|cut -c $(echo "$serviceName : "|wc -c)-)
 	local serviceGroup=$(echo $userGroups|cut -d' ' -f 1)
+	local userHomeDirectory=$(eval echo ~$user)
 	
 	#Remove user
 	echo -n "Removing user $user: "
@@ -84,6 +86,8 @@ function uninstall {
 	else
 		displayErrorMessage "Failed"	
 	fi
+
+	chown root:root -R $userHomeDirectory
 
 	#Remove group
 	echo -n "Removing group $serviceGroup: "
