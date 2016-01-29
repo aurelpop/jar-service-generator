@@ -41,7 +41,7 @@ function startServiceProcess {
 	makeFileWritable $serviceLogFile $serviceGroup || return 1
 
 	local cmd="setsid $javaCommandLine >>$serviceLogFile 2>&1 & echo \$! >$pidFile"
-	sudo -u $serviceUser $SHELL -c "$cmd" || return 1
+	su $serviceUser $SHELL -c "$cmd" || return 1
 	sleep 0.1
 
 	servicePid="$(<$pidFile)"
