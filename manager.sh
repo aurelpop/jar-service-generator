@@ -152,7 +152,7 @@ jarPathOption="$4"
 #Initialize data
 jarPath=$(getOptionValue $jarPathOption "jarPath")
 serviceName=$(getOptionValue $serviceNameOption "serviceName")
-serviceGroup=$(getOptionValue $serviceGroup "serviceGroup")
+serviceGroup=$(getOptionValue $serviceGroupOption "serviceGroup")
 
 #Run
 main $actionOption $serviceName $serviceGroup $jarPath 
