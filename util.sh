@@ -32,7 +32,7 @@ function getOptionValue {
 function makeFileWritable {
 	#Initialize parameters
 	local fileName="$1"
-	local group="$1"
+	local group="$2"
 
 	touch $fileName || return 1
 	chgrp $group $fileName || return 1
