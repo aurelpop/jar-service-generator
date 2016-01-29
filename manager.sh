@@ -105,6 +105,17 @@ function uninstall {
 	displaySuccessMessage "Done"
 }
 
+function checkServiceExists {
+	#Initialize parameters
+	local serviceName="$1"
+	
+	if [ -f "/etc/init.d/$serviceName" ]; then
+	    exit 0
+	else
+	    exit 2
+	fi
+}
+
 function main {
 	local action="$1"
 	local serviceName="$2"
@@ -122,6 +133,8 @@ function main {
 			validateParameterSet $serviceName
 			uninstall $serviceName
 		;;
+		check)
+			checkServiceExists $serviceName
 		*)
 		 	usage
 		 ;;
