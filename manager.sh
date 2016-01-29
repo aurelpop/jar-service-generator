@@ -38,7 +38,7 @@ function install {
 	echo -n "Creating user $user: "
 	if [ $code -ne 0 ]; then
 		useradd -r -c "user for $serviceName service" -g $serviceGroup -d $serviceHomeDirectory $user
-		chown $user:$user -R $serviceHomeDirector
+		chown $user:$user -R $serviceHomeDirectory
 		displaySuccessMessage "Done"
 	else
 		displaySuccessMessage "Already exists"
