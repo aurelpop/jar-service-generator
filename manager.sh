@@ -135,6 +135,7 @@ function main {
 		;;
 		check)
 			checkServiceExists $serviceName
+		;;
 		*)
 		 	usage
 		 ;;
