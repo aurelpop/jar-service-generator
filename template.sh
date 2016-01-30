@@ -161,6 +161,6 @@ pidFile="/var/run/$serviceName.pid"
 
 javaCommand="java"
 maxShutdownTime=15
-javaCommandLine="$JAVA_HOME/bin/$javaCommand -jar %JAR_PATH%"
+javaCommandLine="$javaCommand -jar %JAR_PATH%"
 
 main $1
