@@ -12,7 +12,8 @@ function install {
 	local jarPath="$1"
 	local serviceName="$2"
 	local serviceGroup="$3"
-	local javaOptions="$4"
+	local jarParameters="$4"
+	local javaOptions="$5"
 
 	#Initialize data
 	local user="$serviceName"
@@ -53,6 +54,7 @@ function install {
 	template="${template/\%SERVICE_NAME\%/$serviceName}"
 	template="${template/\%USER\%/$serviceName}"
 	template="${template/\%GROUP\%/$serviceName}"
+	template="${template/\%JAR_PARAMETERS\%/$jarParameters}"
 	template="${template/\%JAVA_OPTIONS\%/$javaOptions}"
 	template="${template/\%JAR_PATH\%/$jarPath}"
 	template="${template/\%UTIL_SCRIPTS\%/$utilFunctions}"
@@ -67,80 +69,34 @@ function install {
 	return 0;
 }
 
-function uninstall {
-	#Initialize parameters
-	local serviceName="$1"
-	
-	#Initialize data
-	local user="$serviceName"
-	local userGroups=$(groups $serviceName|cut -c $(echo "$serviceName : "|wc -c)-)
-	local serviceGroup=$(echo $userGroups|cut -d' ' -f 1)
-	local userHomeDirectory=$(eval echo ~$user)
-	
-	#Remove user
-	echo -n "Removing user $user: "
-	userdel $user >/dev/null 2>&1
-	local code=$?
-	if [ $code -eq 0 ]; then
-		displaySuccessMessage "Done"
-	elif [ $code -eq 6 ]; then
-		displayErrorMessage "User doesn't exist"
-	else
-		displayErrorMessage "Failed"	
-	fi
-
-	chown root:root -R $userHomeDirectory
-
-	#Remove group
-	echo -n "Removing group $serviceGroup: "
-	groupdel $serviceGroup
-	if [ $? -ne 0 ]; then
-		displayErrorMessage "Failed (Possible reason: Permission Denied)"
-	else
-		displaySuccessMessage "Done"
-	fi
-
-	#Remove script from /etc/rc.init
-	echo -n "Removing service file: "
-	rm -rf /etc/init.d/$serviceName
-	displaySuccessMessage "Done"
-
-	#Unregister service
-	echo -n "Disabling service: "
-	update-rc.d $serviceName remove >/dev/null 2>&1
-	displaySuccessMessage "Done"
-}
-
-function checkServiceExists {
-	#Initialize parameters
-	local serviceName="$1"
-	
-	if [ -f "/etc/init.d/$serviceName" ]; then
-	    exit 0
-	else
-	    exit 2
-	fi
-}
-
 function main {
+	#Initialize parameters
 	local action="$1"
 	local serviceName="$2"
 	local serviceGroup="$3"
 	local jarPath="$4"
-	local javaOptions="$5"
+	local jarParameters="$5"
+	local javaOptions="$6"
 
 	case "$action" in
 		install)
+			#Check that the required options are set
 			validateParameterSet $jarPath
 			validateParameterSet $serviceName
-			validateParameterSet $serviceGroup		
-			install $jarPath $serviceName $serviceGroup $javaOptions
+			validateParameterSet $serviceGroup	
+	
+			install $jarPath $serviceName $serviceGroup $jarParameters $javaOptions
 		;;
 		uninstall)
+			#Check that the required options are set
 			validateParameterSet $serviceName
+
 			uninstall $serviceName
 		;;
 		check)
+			#Check that the required options are set
+			validateParameterSet $serviceName
+
 			checkServiceExists $serviceName
 		;;
 		*)
@@ -150,20 +106,20 @@ function main {
 	return 0;
 }
 
-#Initialize parameters
-actionOption="$1"
-serviceNameOption="$2"
-serviceGroupOption="$3"
-jarPathOption="$4"
-javaParametersOption="$5"
+#Initialize options variable
+for option in "$@"; do options=$(addOption "$options" $option); done
+options=$(addOption "$options" "action" $1)
 
-#Initialize data
-jarPath=$(getOptionValue $jarPathOption "jarPath")
-serviceName=$(getOptionValue $serviceNameOption "serviceName")
-serviceGroup=$(getOptionValue $serviceGroupOption "serviceGroup")
-javaOptions=$(getOptionValue $javaParametersOption "javaOptions")
+
+#Initialize options
+action=$(getOption "$options" "action")
+jarPath=$(getOption "$options" "jarPath")
+jarParameters=$(getOption "$options" "jarParameters")
+javaOptions=$(getOption "$options" "javaOptions")
+serviceName=$(getOption "$options" "serviceName")
+serviceGroup=$(getOption "$options" "serviceGroup")
 
 #Run
-main $actionOption $serviceName $serviceGroup $jarPath $javaOptions
+main $action $serviceName $serviceGroup $jarPath $jarParameters $javaOptions
 
 

@@ -141,6 +141,9 @@ function main {
 		status)
 			checkServiceStatus
 		;;
+		uninstall)
+			uninstall $serviceName
+		;;
 		*)
 			displayErrorMessage "Usage: $0 {start|stop|restart|status}"
 			exit 1
@@ -161,6 +164,6 @@ pidFile="/var/run/$serviceName.pid"
 
 javaCommand="java"
 maxShutdownTime=15
-javaCommandLine="$javaCommand %JAVA_OPTIONS% -jar %JAR_PATH%"
+javaCommandLine="$javaCommand %JAVA_OPTIONS% -jar %JAR_PATH% %JAR_PARAMETERS%"
 
 main $1
