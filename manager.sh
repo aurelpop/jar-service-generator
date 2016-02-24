@@ -3,7 +3,7 @@
 . util.sh
 
 function usage {
-	echo "Usage: $0 {install|uninstall} [--serviceName=VALUE] [--serviceGroup=VALUE] [--jarPath=VALUE]"
+	echo "Usage: $0 {install|uninstall} [--serviceName=VALUE] [--serviceGroup=VALUE] [--jarPath=VALUE] [--javaOptions=VALUE]"
 	exit 1
 }
 
@@ -12,6 +12,7 @@ function install {
 	local jarPath="$1"
 	local serviceName="$2"
 	local serviceGroup="$3"
+	local javaOptions="$4"
 
 	#Initialize data
 	local user="$serviceName"
@@ -52,6 +53,7 @@ function install {
 	template="${template/\%SERVICE_NAME\%/$serviceName}"
 	template="${template/\%USER\%/$serviceName}"
 	template="${template/\%GROUP\%/$serviceName}"
+	template="${template/\%JAVA_OPTIONS\%/$javaOptions}"
 	template="${template/\%JAR_PATH\%/$jarPath}"
 	template="${template/\%UTIL_SCRIPTS\%/$utilFunctions}"
 
@@ -125,13 +127,14 @@ function main {
 	local serviceName="$2"
 	local serviceGroup="$3"
 	local jarPath="$4"
+	local javaOptions="$5"
 
 	case "$action" in
 		install)
 			validateParameterSet $jarPath
 			validateParameterSet $serviceName
 			validateParameterSet $serviceGroup		
-			install $jarPath $serviceName $serviceGroup
+			install $jarPath $serviceName $serviceGroup $javaOptions
 		;;
 		uninstall)
 			validateParameterSet $serviceName
@@ -152,13 +155,15 @@ actionOption="$1"
 serviceNameOption="$2"
 serviceGroupOption="$3"
 jarPathOption="$4"
+javaParametersOption="$5"
 
 #Initialize data
 jarPath=$(getOptionValue $jarPathOption "jarPath")
 serviceName=$(getOptionValue $serviceNameOption "serviceName")
 serviceGroup=$(getOptionValue $serviceGroupOption "serviceGroup")
+javaOptions=$(getOptionValue $javaParametersOption "javaOptions")
 
 #Run
-main $actionOption $serviceName $serviceGroup $jarPath 
+main $actionOption $serviceName $serviceGroup $jarPath $javaOptions
 
 
