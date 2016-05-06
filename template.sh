@@ -18,8 +18,8 @@ function checkProcessIsOurService {
 	local cmd="$(ps -p $pid --no-headers -o comm)"
 
 	if [ "$cmd" != "$javaCommand" -a "$cmd" != "$javaCommand.bin" ]; then return 1; fi
-	grep -q --binary -F "$serviceName" /proc/$pid/cmdline
-	if [ $? -ne 0 ]; then return 1; fi
+	#grep -q --binary -F "$serviceName" /proc/$pid/cmdline
+	#if [ $? -ne 0 ]; then return 1; fi
 
 	return 0;
 }
